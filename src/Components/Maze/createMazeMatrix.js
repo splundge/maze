@@ -38,21 +38,11 @@ export const createMazeMatrix = (width, height) => {
 		[width - 1, height - 1]
 	);
 
-	for (let y = 0; y < height; y++) {
-		for (let x = 0; x < width; x++) {
-			if (isCoordinates([x, y], startCoordinate)) {
-				matrix[y][x] = mazeTileTypes.start;
-			} else if (isCoordinates([x, y], endCoordinate)) {
-				matrix[y][x] = mazeTileTypes.end;
-			} else {
-				matrix[y][x] = getRandomTile();
-			}
-		}
-	}
-	//set the start/end
-	//set a path to the end
-	//create winding other paths
+	//set the start/end coordinates
+	matrix[startCoordinate[0]][startCoordinate[1]] = mazeTileTypes.start;
+	matrix[endCoordinate[0]][endCoordinate[1]] = mazeTileTypes.end;
 
-	console.log('matrix', matrix);
+	//todo: create paths in the maze
+
 	return matrix;
 };
