@@ -1,0 +1,9 @@
+.maze {
+	&__row {
+		display: flex;
+		flex-wrap: nowrap;
+	}
+	display: flex;
+	flex-wrap: nowrap;
+	flex-direction: column;
+}
