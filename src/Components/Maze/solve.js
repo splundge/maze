@@ -1,5 +1,10 @@
-import cloneDeep from 'lodash.clonedeep';
-import { mazeTileTypes } from '../MazeTile/MazeTileConstants';
+const mazeTileTypes = {
+	path: 0,
+	wall: 1,
+	start: 2,
+	end: 3,
+	attempt: 4,
+};
 
 const directions = {
 	left: 0,
@@ -23,6 +28,21 @@ const directionToString = direction => {
 			throw new Error(`unknown direction '${direction}'`);
 	}
 }
+
+const originalMaze = [
+	[0, 1, 0, 0, 0, 1, 1, 0, 0, 0],
+	[0, 1, 0, 1, 0, 0, 0, 0, 1, 0],
+	[0, 0, 0, 1, 0, 1, 1, 1, 1, 1],
+	[1, 0, 1, 1, 0, 1, 0, 0, 0, 1],
+	[1, 0, 1, 0, 0, 1, 0, 1, 0, 1],
+	[1, 0, 1, 1, 1, 1, 0, 1, 0, 1],
+	[0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
+	[0, 1, 1, 1, 1, 1, 1, 1, 0, 1],
+	[0, 1, 0, 0, 0, 0, 0, 1, 0, 1],
+	[0, 0, 2, 1, 1, 1, 0, 1, 0, 3]
+];
+
+console.log(originalMaze[9][9]);
 
 /**
  * given coordinates A and coordinates B, this function checks to see if A and B are equal
@@ -76,8 +96,9 @@ const historyContains = (history, coordinates) => {
 	return false;
 }
 
-const canMove = (direction, currentCoordinates, maze, history) => {
-	const newCoordinates = moveCoordinates(direction, currentCoordinates);
+const canMove = (direction, maze, history) => {
+	const lastCoordinates = getCurrentCoordinates(history);
+	const newCoordinates = moveCoordinates(direction, lastCoordinates);
     const mazeTile = getMazeTile(maze, newCoordinates);
 
     if(!isWithinBoundsOfMatrix(maze, newCoordinates)){
@@ -123,34 +144,8 @@ const getMazeTile = (maze, coordinates) => {
     return maze[y][x];
 };
 
-/**
- * moves you to a new position
- */
-const move = (direction, history) => {
-	let currentCoordinates = getCurrentCoordinates(history);
-	let newCoordinates = moveCoordinates(direction, currentCoordinates);
-	history.push(newCoordinates);
-}
-
-/**
- * try to go back to the last intersection 
- */
-const goBack = (maze, history) => {
-	for (let x = history.length - 1; x >= 0; x--) {
-		const oldCoordinates = history[x];
-		if(canMove(directions.right, oldCoordinates, maze, history)
-		|| canMove(directions.down, oldCoordinates, maze, history)
-		|| canMove(directions.left, oldCoordinates, maze, history)
-		|| canMove(directions.up, oldCoordinates, maze, history)){
-			history.push(oldCoordinates);
-			return;
-		}
-	}
-}
-
-export const solveMazeMatrix = (mazeMatrix) => {
-
-	const clonedMaze = cloneDeep(mazeMatrix);
+const solveMazeMatrix = (mazeMatrix) => {
+	const clonedMaze = [...mazeMatrix];
 
 	//finds the start of the maze
 	const startCoordinates = getCoordinatesByTileType(clonedMaze, mazeTileTypes.start);
@@ -168,33 +163,21 @@ export const solveMazeMatrix = (mazeMatrix) => {
 	console.log('your current position is ', currentCoordinates);
 	console.log('your current maze tile is', getMazeTile(clonedMaze, currentCoordinates));
 
-	const maxAttempts = 1000;
-
-	for(let currentAttempt = 0; currentAttempt < maxAttempts && getMazeTile(clonedMaze, getCurrentCoordinates(stepHistory)) !== mazeTileTypes.end; currentAttempt++){
-		const currentCoordinates = getCurrentCoordinates(stepHistory);
-		if(canMove(directions.left, currentCoordinates, clonedMaze, stepHistory)){
-			console.log('you can move left!');
-			move(directions.left, stepHistory);
-		} else if(canMove(directions.down, currentCoordinates, clonedMaze, stepHistory)){
-			console.log('you can move down!');
-			move(directions.down, stepHistory);
-		} else if(canMove(directions.right, currentCoordinates, clonedMaze, stepHistory)){
-			console.log('you can move right!');
-			move(directions.right, stepHistory);
-		} else if(canMove(directions.up, currentCoordinates, clonedMaze, stepHistory)){
-			console.log('you can move up!');
-			move(directions.up, stepHistory);
-		} else {
-			goBack(clonedMaze, stepHistory);
-		}
+	if(canMove(directions.left, clonedMaze, stepHistory)){
+		console.log('you can move left!');
 	}
-	
-	//now mark each position we visited
-	for (let x = 0; x < stepHistory.length; x++) {
-		const coordinates = stepHistory[x];
-		clonedMaze[coordinates[0]][coordinates[1]] = mazeTileTypes.attempt;
+	if(canMove(directions.down, clonedMaze, stepHistory)){
+		console.log('you can move down!');
+	}
+	if(canMove(directions.right, clonedMaze, stepHistory)){
+		console.log('you can move right!');
+	}
+	if(canMove(directions.up, clonedMaze, stepHistory)){
+		console.log('you can move up!');
 	}
 
 	//I have a starting position but cannot figure out the value of the next position in the array.
 	return clonedMaze;
 };
+
+solveMazeMatrix(originalMaze);

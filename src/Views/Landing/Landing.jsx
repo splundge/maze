@@ -2,12 +2,15 @@ import React from 'react';
 import Maze from '../../Components/Maze/Maze';
 import { sampleMazes } from '../../Components/Maze/sampleMazes';
 import './Landing.scss';
+import { solveMazeMatrix } from '../../Components/Maze/solveMazeMatrix';
 
 const Landing = () => {
 	return (
 		<div className="landing">
 			<Maze matrix={sampleMazes.maze1} solve />
-			{/*
+			{
+
+				/*
 				part 1: explore each maze. write an algorithm that solves the maze, using the 'mazeTileTypes.attempt' tile to represent your path
 				note, use the 'solve' truthy attribute to determine whether the maze should be solved or unsolved
 
@@ -32,3 +35,4 @@ const Landing = () => {
 };
 
 export default Landing;
+
